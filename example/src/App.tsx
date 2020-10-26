@@ -13,7 +13,6 @@ export default function App() {
         if (success) {
           setStatus('Getting workouts...');
           return Healthkit.getWorkouts().then((items) => {
-            console.log(JSON.stringify(items));
             setStatus('Workouts: ' + items.length);
             setWorkouts(items);
           });
