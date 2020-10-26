@@ -1,7 +1,17 @@
 import { NativeModules } from 'react-native';
 
+export interface Workout {
+  uuid: string;
+  startDate: string;
+  endDate: string;
+  activityName: string;
+  distance: number;
+  duration: number;
+}
+
 type HealthkitType = {
-  multiply(a: number, b: number): Promise<number>;
+  requestPermissions(): Promise<boolean>;
+  getWorkouts(): Promise<Workout[]>;
 };
 
 const { Healthkit } = NativeModules;
