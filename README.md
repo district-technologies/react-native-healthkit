@@ -13,17 +13,17 @@ npm install react-native-healthkit
 ```js
 import Healthkit, { Workout } from 'react-native-healthkit';
 
+// ...
+
 Healthkit.requestPermissions().then((success) => {
   if (success) {
-    Healthkit.getWorkouts().then((workouts) => {
+    Healthkit.getWorkouts().then((workouts: Workout[]) => {
       // TODO: Use workout data
     });
   }
 });
 
 // ...
-
-const result = await Healthkit.multiply(3, 7);
 ```
 
 ## Contributing
