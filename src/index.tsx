@@ -84,17 +84,30 @@ export enum WorkoutActivityType {
   yoga = 'yoga',
 }
 export interface Workout {
+  /** Unique identifier for the workout */
   uuid: string;
+  /** Start date as an ISO8601 string */
   startDate: string;
+  /** End date as an ISO8601 string */
   endDate: string;
+  /** Activity type for the workout */
   workoutActivityType: WorkoutActivityType;
+  /** Total distance in meters */
   totalDistance: number;
+  /** Duration in seconds */
   duration: number;
+}
+
+export interface WorkoutQuery {
+  /** Start time in milliseconds */
+  startDate?: number;
+  /** End time in milliseconds */
+  endDate?: number;
 }
 
 type HealthkitType = {
   requestPermissions(): Promise<boolean>;
-  getWorkouts(): Promise<Workout[]>;
+  getWorkouts(input: WorkoutQuery): Promise<Workout[]>;
 };
 
 const { Healthkit } = NativeModules;

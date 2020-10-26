@@ -26,8 +26,8 @@ class Healthkit: NSObject {
         })
     }
     
-    @objc(getWorkouts:withRejecter:)
-    func getWorkouts(resolve:@escaping RCTPromiseResolveBlock,reject:@escaping RCTPromiseRejectBlock) -> Void {
+    @objc(getWorkouts:withResolver:withRejecter:)
+    func getWorkouts(input:Dictionary<String, Any>, resolve:@escaping RCTPromiseResolveBlock,reject:@escaping RCTPromiseRejectBlock) -> Void {
         guard let store = healthStore else {
             reject("Not Intialised", "HealthKit Store is not initialised", nil)
             return
@@ -35,7 +35,22 @@ class Healthkit: NSObject {
         
         let sampleType = HKSampleType.workoutType()
         
-        let query = HKSampleQuery(sampleType: sampleType, predicate: nil, limit: Int(HKObjectQueryNoLimit), sortDescriptors: nil) { (query, results, error) in
+        let startDate = input["startDate"] as? Double
+        let endDate = input["endDate"] as? Double
+        
+        var start = Date()
+        if let startDate = startDate {
+            start = Date(timeIntervalSince1970: startDate / 1000)
+        }
+        
+        var end = Date()
+        if let endDate = endDate {
+            end = Date(timeIntervalSince1970: endDate / 1000)
+        }
+        
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
+        
+        let query = HKSampleQuery(sampleType: sampleType, predicate: predicate, limit: Int(HKObjectQueryNoLimit), sortDescriptors: nil) { (query, results, error) in
             
             if let error = error {
                 reject("Query Failed", error.localizedDescription, error)
@@ -63,6 +78,13 @@ func buildISO8601StringFromDate(_ date:Date) -> String {
     formatter.locale = Locale(identifier: "en_US_POSIX")
     formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ"
     return formatter.string(from:date)
+}
+
+func dateFromISO8601String(_ string:String) -> Date? {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ"
+    return formatter.date(from: string)
 }
 
 extension HKWorkout {

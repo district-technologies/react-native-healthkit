@@ -12,7 +12,9 @@ export default function App() {
       .then(async (success) => {
         if (success) {
           setStatus('Getting workouts...');
-          return Healthkit.getWorkouts().then((items) => {
+          return Healthkit.getWorkouts({
+            startDate: Date.parse('2018-01-01'),
+          }).then((items) => {
             setStatus('Workouts: ' + items.length);
             setWorkouts(items);
           });
