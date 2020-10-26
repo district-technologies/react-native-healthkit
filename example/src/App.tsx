@@ -30,7 +30,7 @@ export default function App() {
       <Text style={styles.statusText}>{status}</Text>
       <ScrollView style={styles.workoutContainer}>
         {workouts
-          ?.filter((item) => item.distance > 0 && item.duration > 0)
+          ?.filter((item) => item.totalDistance > 0 && item.duration > 0)
           ?.map((item) => {
             return (
               <View key={item.uuid} style={styles.workoutRow}>
@@ -43,10 +43,13 @@ export default function App() {
                   </Text>
                 </View>
                 <Text style={styles.durationColumn}>
+                  {item.workoutActivityType}
+                </Text>
+                <Text style={styles.durationColumn}>
                   {(item.duration / 60).toFixed(0) + ' mins'}
                 </Text>
                 <Text style={styles.distanceColumn}>
-                  {(item.distance / 1000).toFixed(2) + ' km'}
+                  {(item.totalDistance / 1000).toFixed(2) + ' km'}
                 </Text>
               </View>
             );

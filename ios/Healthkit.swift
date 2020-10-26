@@ -47,28 +47,8 @@ class Healthkit: NSObject {
                 return
             }
             
-            var workouts:Array<Dictionary<String, Any>> = []
-            for sample in samples {
-                var activityName:String
-                
-                switch sample.workoutActivityType {
-                case HKWorkoutActivityType.walking:
-                    activityName = "Walking"
-                case HKWorkoutActivityType.running:
-                    activityName = "Running"
-                default:
-                    activityName = "Other"
-                }
-                
-                workouts.append([
-                    "uuid":sample.uuid.uuidString,
-                    "startDate":self.buildISO8601StringFromDate(sample.startDate),
-                    "endDate":self.buildISO8601StringFromDate(sample.endDate),
-                    "activityName":activityName,
-                    "distance":sample.totalDistance?.doubleValue(for: .meter()) ?? 0,
-                    "duration":sample.duration
-                ])
-                
+            let workouts = samples.map { (workout) in
+                return workout.toJSONDictionary()
             }
             
             resolve(workouts)
@@ -76,11 +56,113 @@ class Healthkit: NSObject {
         
         store.execute(query)
     }
-    
-    func buildISO8601StringFromDate(_ date:Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ"
-        return formatter.string(from:date)
+}
+
+func buildISO8601StringFromDate(_ date:Date) -> String {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ"
+    return formatter.string(from:date)
+}
+
+extension HKWorkout {
+    func toJSONDictionary() -> Dictionary<String, Any> {
+        return [
+            "uuid":self.uuid.uuidString,
+            "startDate":buildISO8601StringFromDate(self.startDate),
+            "endDate":buildISO8601StringFromDate(self.endDate),
+            "workoutActivityType":self.workoutActivityType.toString(),
+            "totalDistance":self.totalDistance?.doubleValue(for: .meter()) ?? 0,
+            "duration":self.duration
+        ]
+    }
+}
+
+extension HKWorkoutActivityType {
+    func toString() -> String {
+        switch self {
+        case .americanFootball:return "americanFootball"
+        case .archery: return "archery"
+        case .australianFootball: return "australianFootball"
+        case .badminton: return "badminton"
+        case .barre: return "barre"
+        case .baseball: return "baseball"
+        case .basketball: return "basketball"
+        case .bowling: return "bowling"
+        case .boxing: return "boxing"
+        case .cardioDance: return "cardioDance"
+        case .climbing: return "climbing"
+        case .cooldown: return "cooldown"
+        case .coreTraining: return "coreTraining"
+        case .cricket: return "cricket"
+        case .crossCountrySkiing: return "crossCountrySkiing"
+        case .crossTraining: return "crossTraining"
+        case .curling: return "curling"
+        case .cycling: return "cycling"
+        case .dance: return "dance"
+        case .danceInspiredTraining: return "danceInspiredTraining"
+        case .discSports: return "discSports"
+        case .downhillSkiing: return "downhillSkiing"
+        case .elliptical: return "elliptical"
+        case .equestrianSports: return "equestrianSports"
+        case .fencing: return "fencing"
+        case .fishing: return "fishing"
+        case .fitnessGaming: return "fitnessGaming"
+        case .flexibility: return "flexibility"
+        case .functionalStrengthTraining: return "functionalStrengthTraining"
+        case .golf: return "golf"
+        case .gymnastics: return "gymnastics"
+        case .handCycling: return "handCycling"
+        case .handball: return "handball"
+        case .highIntensityIntervalTraining: return "highIntensityIntervalTraining"
+        case .hiking: return "hiking"
+        case .hockey: return "hockey"
+        case .hunting: return "hunting"
+        case .jumpRope: return "jumpRope"
+        case .kickboxing: return "kickboxing"
+        case .lacrosse: return "lacrosse"
+        case .martialArts: return "martialArts"
+        case .mindAndBody: return "mindAndBody"
+        case .mixedCardio: return "mixedCardio"
+        case .mixedMetabolicCardioTraining: return "mixedMetabolicCardioTraining"
+        case .other: return "other"
+        case .paddleSports: return "paddleSports"
+        case .pickleball: return "pickleball"
+        case .pilates: return "pilates"
+        case .play: return "play"
+        case .preparationAndRecovery: return "preparationAndRecovery"
+        case .racquetball: return "racquetball"
+        case .rowing: return "rowing"
+        case .rugby: return "rugby"
+        case .running: return "running"
+        case .sailing: return "sailing"
+        case .skatingSports: return "skatingSports"
+        case .snowSports: return "snowSports"
+        case .snowboarding: return "snowboarding"
+        case .soccer: return "soccer"
+        case .socialDance: return "socialDance"
+        case .softball: return "softball"
+        case .squash: return "squash"
+        case .stairClimbing: return "stairClimbing"
+        case .stairs: return "stairs"
+        case .stepTraining: return "stepTraining"
+        case .surfingSports: return "surfingSports"
+        case .swimming: return "swimming"
+        case .tableTennis: return "tableTennis"
+        case .taiChi: return "taiChi"
+        case .tennis: return "tennis"
+        case .trackAndField: return "trackAndField"
+        case .traditionalStrengthTraining: return "traditionalStrengthTraining"
+        case .volleyball: return "volleyball"
+        case .walking: return "walking"
+        case .waterFitness: return "waterFitness"
+        case .waterPolo: return "waterPolo"
+        case .waterSports: return "waterSports"
+        case .wheelchairRunPace: return "wheelchairRunPace"
+        case .wheelchairWalkPace: return "wheelchairWalkPace"
+        case .wrestling: return "wrestling"
+        case .yoga: return "yoga"
+        default: return "other"
+        }
     }
 }
