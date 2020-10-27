@@ -9,4 +9,8 @@ RCT_EXTERN_METHOD(getWorkouts:(NSDictionary)input
                   withResolver:(RCTPromiseResolveBlock)resolve
                   withRejecter:(RCTPromiseRejectBlock)reject)
 
++ (BOOL)requiresMainQueueSetup {
+  return YES;  // only do this if your module initialization relies on calling UIKit!
+}
+
 @end
