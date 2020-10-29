@@ -328,7 +328,8 @@ extension CLLocation {
             "verticalAccuracy":self.verticalAccuracy,
             "speed":self.speed,
             "course":self.course,
-            "altitude":self.altitude
+            "altitude":self.altitude,
+            "floor":self.floor?.level
         ]
     }
 }

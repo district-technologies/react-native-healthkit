@@ -104,6 +104,10 @@ export interface CLLocation {
   speed: number;
   /** The course of the location in degrees true North. Negative if course is invalid. */
   course: number;
+  /** The altitude of the location in degrees true North. Negative if course is invalid. */
+  altitude: number;
+  /** The logical floor that you are on in the current building if you are inside a supported venue. */
+  floor?: number;
 }
 
 export interface WorkoutRoute {
