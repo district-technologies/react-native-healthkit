@@ -83,6 +83,37 @@ export enum WorkoutActivityType {
   wrestling = 'wrestling',
   yoga = 'yoga',
 }
+
+export interface CLLocationCoordinate {
+  /** The latitude in degrees. */
+  latitude: number;
+  /** The longitude in degrees. */
+  longitude: number;
+}
+
+export interface CLLocation {
+  /** The coordinates for the locations */
+  coordinate: CLLocationCoordinate;
+  /** The horizontal accuracy of the location. Negative if the lateral location is invalid. */
+  horizontalAccuracy: number;
+  /** The vertical accuracy of the location. Negative if the altitude is invalid */
+  verticalAccuracy: number;
+  /** The speed of the location in m/s. Negative if speed is invalid. */
+  speed: number;
+  /** The course of the location in degrees true North. Negative if course is invalid. */
+  course: number;
+}
+
+export interface WorkoutRoute {
+  /** Unique identifier for the workout route */
+  uuid: string;
+  /** Start date as an ISO8601 string */
+  startDate: string;
+  /** End date as an ISO8601 string */
+  endDate: string;
+  /** List of associated locations for the workout route */
+  locations?: CLLocation[];
+}
 export interface Workout {
   /** Unique identifier for the workout */
   uuid: string;
@@ -96,6 +127,8 @@ export interface Workout {
   totalDistance: number;
   /** Duration in seconds */
   duration: number;
+  /** List of associated routes for the workout */
+  routes?: WorkoutRoute[];
 }
 
 export interface WorkoutQuery {
