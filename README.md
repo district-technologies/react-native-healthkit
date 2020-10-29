@@ -17,7 +17,8 @@ import Healthkit, { Workout } from 'react-native-healthkit';
 
 Healthkit.requestPermissions().then((success) => {
   if (success) {
-    Healthkit.getWorkouts().then((workouts: Workout[]) => {
+    Healthkit.getWorkouts({ startDate, endDate }),
+          }).then((workouts: Workout[]) => {
       // TODO: Use workout data
     });
   }

@@ -43,16 +43,25 @@ export default function App() {
                   <Text numberOfLines={1} ellipsizeMode="tail">
                     {item.endDate}
                   </Text>
+                  <View style={styles.activityRow}>
+                    <Text>{item.workoutActivityType}</Text>
+                    <Text>
+                      {item.routes?.reduce((result, item) => {
+                        if (item.locations) {
+                          result += item.locations?.length;
+                        }
+                        return result;
+                      }, 0) || 'no'}{' '}
+                      locations
+                    </Text>
+                    <Text style={styles.duration}>
+                      {(item.duration / 60).toFixed(0) + ' mins'}
+                    </Text>
+                    <Text style={styles.distance}>
+                      {(item.totalDistance / 1000).toFixed(2) + ' km'}
+                    </Text>
+                  </View>
                 </View>
-                <Text style={styles.durationColumn}>
-                  {item.workoutActivityType}
-                </Text>
-                <Text style={styles.durationColumn}>
-                  {(item.duration / 60).toFixed(0) + ' mins'}
-                </Text>
-                <Text style={styles.distanceColumn}>
-                  {(item.totalDistance / 1000).toFixed(2) + ' km'}
-                </Text>
               </View>
             );
           })}
@@ -76,7 +85,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     padding: 6,
   },
-  dateColumn: { flex: 3, paddingHorizontal: 6 },
-  durationColumn: { flex: 1, textAlign: 'right', paddingHorizontal: 6 },
-  distanceColumn: { flex: 1, textAlign: 'right', paddingHorizontal: 6 },
+  dateColumn: { flex: 1, paddingHorizontal: 6 },
+  duration: { textAlign: 'right', paddingHorizontal: 6 },
+  distance: { textAlign: 'right', paddingHorizontal: 6 },
+  activityRow: { flexDirection: 'row', justifyContent: 'space-between' },
 });
