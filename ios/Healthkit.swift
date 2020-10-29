@@ -313,8 +313,8 @@ extension HKWorkoutRoute {
     func toJSONDictionary() -> Dictionary<String, Any> {
         return [
             "uuid":self.uuid.uuidString,
-            "startDate":self.startDate,
-            "endDate":self.endDate,
+            "startDate":buildISO8601StringFromDate(self.startDate),
+            "endDate":buildISO8601StringFromDate(self.endDate),
         ]
     }
 }
@@ -323,10 +323,12 @@ extension CLLocation {
     func toJSONDictionary() -> Dictionary<String, Any?>{
         return [
             "coordinate":["latitude":self.coordinate.latitude, "longitude":self.coordinate.longitude],
+            "timeStamp":buildISO8601StringFromDate(self.timestamp),
             "horizontalAccuracy":self.horizontalAccuracy,
             "verticalAccuracy":self.verticalAccuracy,
             "speed":self.speed,
             "course":self.course,
+            "altitude":self.altitude
         ]
     }
 }
