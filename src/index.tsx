@@ -94,6 +94,8 @@ export interface CLLocationCoordinate {
 export interface CLLocation {
   /** The coordinates for the locations */
   coordinate: CLLocationCoordinate;
+  /** Timestamp as an ISO8601 string */
+  timestamp: string;
   /** The horizontal accuracy of the location. Negative if the lateral location is invalid. */
   horizontalAccuracy: number;
   /** The vertical accuracy of the location. Negative if the altitude is invalid */
