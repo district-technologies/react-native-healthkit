@@ -21,6 +21,10 @@ class Healthkit: NSObject {
         if #available(iOS 11.0, *) {
             permissions.insert(HKSeriesType.workoutRoute())
         }
+
+        let stepsCountIdentifier = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
+        permissions.insert(stepsCountIdentifier!)
+
         
         healthStore.requestAuthorization(toShare: [], read: permissions, completion: { (success, error) in
             if let error = error {
