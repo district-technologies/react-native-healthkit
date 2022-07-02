@@ -38,7 +38,6 @@ class Healthkit: NSObject {
     /// Fetches the workouts for a given set of input parameters.
     @objc(getWorkouts:withResolver:withRejecter:)
     func getWorkouts(input:Dictionary<String, Any>, resolve:@escaping RCTPromiseResolveBlock,reject:@escaping RCTPromiseRejectBlock) -> Void {
-        
         var start = Date()
         if let startDate = input["startDate"] as? Double {
             start = Date(timeIntervalSince1970: startDate / 1000)
@@ -63,6 +62,8 @@ class Healthkit: NSObject {
             
             var workoutItems = [Dictionary<String, Any>]()
             
+            if (workouts.count == 0) { return resolve(workoutItems) }
+            
             // Convert each workout into a JSON serializable form and attach associated routes and locations
             workouts.forEach({ (workout) in
                 self.processWorkout(workout) { (workoutData) in
@@ -83,15 +84,42 @@ class Healthkit: NSObject {
     func processWorkout(_ workout:HKWorkout, resultsHandler: @escaping (Dictionary<String, Any>) -> Void) {
         // Convert workout to JSON serializable form
         var workoutData = workout.toJSONDictionary()
-        
+        var gotStepCount = false
+        var gotRoutes = false
+
         // If iOS version is less than 11, routes are not available so just return the workout data
         guard #available(iOS 11.0, *) else { return resultsHandler(workoutData) }
+        
+        self.getSteps(for:workout) { (steps, error) in
+            // If an error occurred or there are no steps, just return the workout data
+            guard error == nil, let steps = steps else {
+                gotStepCount = true
+                if (gotRoutes) { resultsHandler(workoutData) }
+                return
+            }
+            
+            var stepCount:Double = 0
+            
+            // Convert routes to JSON serializable form and fetch any associated locations
+            steps.forEach { (stepData) in
+                stepCount += stepData.quantity.doubleValue(for: .count())
+            }
+            
+            workoutData["stepCount"] = stepCount
+            gotStepCount = true
+            if (gotRoutes) { resultsHandler(workoutData) }
+            return
+        }
         
         // Get routes for the workout
         self.getRoutes(for:workout) { (routes, error) in
             
             // If an error occurred or there are no routes, just return the workout data
-            guard error == nil, let routes = routes, routes.count > 0 else { return resultsHandler(workoutData) }
+            guard error == nil, let routes = routes, routes.count > 0 else {
+                gotRoutes = true
+                if (gotStepCount) { resultsHandler(workoutData) }
+                return
+            }
             
             var routeItems:Array<Dictionary<String, Any>> = []
             
@@ -104,11 +132,41 @@ class Healthkit: NSObject {
                     // If all routes have been processed, attach the routes to the workout and return the data
                     if (routeItems.count == routes.count) {
                         workoutData["routes"] = routeItems
-                        return resultsHandler(workoutData)
+                        gotRoutes = true
+                        if (gotStepCount) { resultsHandler(workoutData) }
+                        return
                     }
                 }
             }
         }
+    }
+    
+    @available(iOS 9.0, *)
+    func getSteps(for workout:HKWorkout, resultsHandler: @escaping ([HKQuantitySample]?, Error?) -> Void) {
+        guard let type:HKQuantityType = HKObjectType.quantityType(forIdentifier: .stepCount) else {
+            return resultsHandler(nil, GetStepsError(errorDescription: "Failed to cast quantity type"))
+        }
+            
+        let start = workout.startDate
+        let end = workout.endDate
+        
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [.strictStartDate, .strictEndDate])
+        
+        let stepsQuery = HKSampleQuery(sampleType:type,
+                                       predicate: predicate,
+                                       limit: HKObjectQueryNoLimit,
+                                       sortDescriptors: nil,
+                                  resultsHandler: { (query, results, error) in
+            guard error == nil else { return resultsHandler(nil, error) }
+            
+            guard let steps = results as? [HKQuantitySample] else {
+                return resultsHandler(nil, GetStepsError(errorDescription: "The query returned unexpected results"))
+            }
+            
+            return resultsHandler(steps, nil)
+        })
+        
+        healthStore.execute(stepsQuery)
     }
     
     @available(iOS 11.0, *)
@@ -184,6 +242,11 @@ class Healthkit: NSObject {
         
         healthStore.execute(query)
     }
+}
+
+struct GetStepsError:LocalizedError {
+    var errorDescription: String?
+    var failureReason: String?
 }
 
 struct GetRoutesError:LocalizedError {

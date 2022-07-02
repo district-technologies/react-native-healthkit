@@ -135,6 +135,8 @@ export interface Workout {
   duration: number;
   /** List of associated routes for the workout */
   routes?: WorkoutRoute[];
+  /** Count of associated steps for the workout */
+  stepCount?: number;
 }
 
 export interface WorkoutQuery {
