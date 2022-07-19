@@ -148,7 +148,7 @@ class Healthkit: NSObject {
         }
             
         let start = workout.startDate
-        let end = workout.endDate
+        let end = workout.endDate.addingTimeInterval(60)
         
         let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [.strictStartDate, .strictEndDate])
         
